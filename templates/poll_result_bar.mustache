@@ -1,0 +1,69 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_quickpoll/poll_result_bar
+
+    Result bar for one quickpoll option.
+
+    Example context (json):
+    {
+        "id": 3,
+        "questionid": 2,
+        "text": "Yes",
+        "count": 4,
+        "percent": 80,
+        "respondents": [
+            {
+                "anonymous": false,
+                "pictureurl": "https://example.com/pix/u/f1.png",
+                "fullname": "Ada Lovelace"
+            }
+        ],
+        "hasrespondents": true,
+        "canvoteoption": true
+    }
+}}
+<div class="mod-quickpoll-option mb-3" data-option-id="{{id}}" data-question-id="{{questionid}}">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <span class="mod-quickpoll-option-text">{{text}}</span>
+        <span class="badge bg-secondary text-white" data-region="quickpoll-count">{{count}}</span>
+    </div>
+    <button
+        type="button"
+        class="btn btn-outline-primary w-100 text-start mod-quickpoll-vote"
+        data-action="quickpoll-vote"
+        data-question-id="{{questionid}}"
+        data-option-id="{{id}}"
+        {{^canvoteoption}}disabled{{/canvoteoption}}>
+        {{text}}
+    </button>
+    <div class="progress mt-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{percent}}">
+        <div class="progress-bar" data-region="quickpoll-bar" data-percent="{{percent}}"></div>
+    </div>
+    <div class="d-flex align-items-center mt-2" data-region="quickpoll-respondents">
+        {{#respondents}}
+            {{#anonymous}}
+                <span class="badge bg-light text-dark me-1">
+                    <i class="fa fa-lock" role="img" aria-label="{{fullname}}"></i>
+                </span>
+            {{/anonymous}}
+            {{^anonymous}}
+                <img class="rounded-circle me-1" src="{{pictureurl}}" alt="{{fullname}}" loading="lazy" width="28" height="28">
+            {{/anonymous}}
+        {{/respondents}}
+    </div>
+</div>

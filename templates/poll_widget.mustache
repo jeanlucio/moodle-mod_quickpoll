@@ -1,0 +1,102 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_quickpoll/poll_widget
+
+    Main quickpoll activity widget.
+
+    Example context (json):
+    {
+        "cmid": 12,
+        "name": "Quick check",
+        "intro": "<p>Choose one option.</p>",
+        "isopen": true,
+        "isclosed": false,
+        "ispending": false,
+        "canvote": true,
+        "canviewresults": true,
+        "allowmultiple": false,
+        "hasanonymous": true,
+        "hasgrade": true,
+        "hasvoted": false,
+        "grade": "10.00000",
+        "message": "",
+        "questions": [],
+        "streamurl": "https://example.com/mod/quickpoll/stream.php?cmid=12"
+    }
+}}
+<section
+    class="mod-quickpoll"
+    data-region="quickpoll"
+    data-cmid="{{cmid}}"
+    data-allow-multiple="{{#allowmultiple}}1{{/allowmultiple}}{{^allowmultiple}}0{{/allowmultiple}}"
+    data-stream-url="{{streamurl}}">
+    <header class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h3 class="h4 mb-1">{{name}}</h3>
+            {{#isopen}}
+                <span class="badge bg-success text-white">{{#str}} live, mod_quickpoll {{/str}}</span>
+            {{/isopen}}
+            {{#isclosed}}
+                <span class="badge bg-secondary text-white">{{#str}} pollclosed, mod_quickpoll {{/str}}</span>
+            {{/isclosed}}
+            {{#ispending}}
+                <span class="badge bg-info text-dark">{{#str}} pollnotopen, mod_quickpoll {{/str}}</span>
+            {{/ispending}}
+            {{#hasvoted}}
+                <span class="badge bg-primary text-white">{{#str}} answered, mod_quickpoll {{/str}}</span>
+            {{/hasvoted}}
+        </div>
+        {{#hasgrade}}
+            <span class="badge bg-light text-dark">{{#str}} pointsbadge, mod_quickpoll, {{grade}} {{/str}}</span>
+        {{/hasgrade}}
+    </header>
+
+    {{{intro}}}
+
+    {{#message}}
+        <div class="alert alert-info" data-region="quickpoll-message">{{message}}</div>
+    {{/message}}
+    {{^message}}
+        <div class="alert alert-info d-none" data-region="quickpoll-message"></div>
+    {{/message}}
+
+    {{#hasanonymous}}
+        <div class="form-check form-switch mb-3">
+            <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="quickpoll-anonymous-{{cmid}}"
+                data-region="quickpoll-anonymous">
+            <label class="form-check-label" for="quickpoll-anonymous-{{cmid}}">
+                {{#str}} optionanonymous, mod_quickpoll {{/str}}
+            </label>
+        </div>
+    {{/hasanonymous}}
+
+    <div data-region="quickpoll-questions">
+        {{#questions}}
+            <section class="mb-4" data-question-id="{{id}}">
+                <h4 class="h5">{{text}}</h4>
+                {{#options}}
+                    {{> mod_quickpoll/poll_result_bar }}
+                {{/options}}
+            </section>
+        {{/questions}}
+    </div>
+</section>

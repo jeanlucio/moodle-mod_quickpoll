@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/quickpoll/db" VERSION="20260508" COMMENT="XMLDB file for mod_quickpoll"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+  <TABLES>
+
+    <TABLE NAME="quickpoll" COMMENT="Stores each quickpoll activity instance">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int"    LENGTH="10" NOTNULL="true"  SEQUENCE="true"/>
+        <FIELD NAME="course"       TYPE="int"    LENGTH="10" NOTNULL="true"  SEQUENCE="false" COMMENT="FK to course.id"/>
+        <FIELD NAME="name"         TYPE="char"   LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="intro"        TYPE="text"              NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="introformat"  TYPE="int"    LENGTH="4"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timeopen"     TYPE="int"    LENGTH="10" NOTNULL="true"  DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp; 0 means open immediately"/>
+        <FIELD NAME="timeclose"    TYPE="int"    LENGTH="10" NOTNULL="true"  DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp; 0 means no close date"/>
+        <FIELD NAME="anonymous"    TYPE="int"    LENGTH="1"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false" COMMENT="0=disabled 1=opt-in by student"/>
+        <FIELD NAME="allowmultiple" TYPE="int"   LENGTH="1"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false" COMMENT="0=single choice 1=multiple choice per question"/>
+        <FIELD NAME="showresults"  TYPE="int"    LENGTH="1"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false" COMMENT="0=always 1=after vote 2=after close"/>
+        <FIELD NAME="maxgrade"     TYPE="number" LENGTH="10" NOTNULL="true"  DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="0 means no grade"/>
+        <FIELD NAME="timecreated"  TYPE="int"    LENGTH="10" NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int"    LENGTH="10" NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <TABLE NAME="quickpoll_questions" COMMENT="Questions belonging to a quickpoll instance">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="pollid"       TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="false" COMMENT="FK to quickpoll.id"/>
+        <FIELD NAME="questiontext" TYPE="text"              NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sortorder"    TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_pollid" TYPE="foreign" FIELDS="pollid" REFTABLE="quickpoll" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_pollid_sortorder" UNIQUE="false" FIELDS="pollid, sortorder"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="quickpoll_options" COMMENT="Answer options for each quickpoll question">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid"  TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="false" COMMENT="FK to quickpoll_questions.id"/>
+        <FIELD NAME="optiontext"  TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sortorder"   TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="quickpoll_questions" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_questionid_sortorder" UNIQUE="false" FIELDS="questionid, sortorder"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="quickpoll_answers" COMMENT="Student answers; userid always stored to prevent duplicate votes">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="pollid"      TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to quickpoll.id"/>
+        <FIELD NAME="questionid"  TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to quickpoll_questions.id"/>
+        <FIELD NAME="optionid"    TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to quickpoll_options.id"/>
+        <FIELD NAME="userid"      TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK to user.id; never exposed to non-teacher WS"/>
+        <FIELD NAME="anonymous"   TYPE="int" LENGTH="1"  NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 only when poll allows opt-in AND student toggled it"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_pollid"     TYPE="foreign" FIELDS="pollid"     REFTABLE="quickpoll"           REFFIELDS="id"/>
+        <KEY NAME="fk_questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="quickpoll_questions" REFFIELDS="id"/>
+        <KEY NAME="fk_optionid"   TYPE="foreign" FIELDS="optionid"   REFTABLE="quickpoll_options"   REFFIELDS="id"/>
+        <KEY NAME="fk_userid"     TYPE="foreign" FIELDS="userid"     REFTABLE="user"                REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_pollid_userid"     UNIQUE="false" FIELDS="pollid, userid"/>
+        <INDEX NAME="ix_pollid_questionid" UNIQUE="false" FIELDS="pollid, questionid"/>
+        <INDEX NAME="ix_optionid"          UNIQUE="false" FIELDS="optionid"/>
+      </INDEXES>
+    </TABLE>
+
+  </TABLES>
+</XMLDB>
