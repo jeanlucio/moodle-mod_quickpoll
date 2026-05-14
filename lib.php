@@ -26,9 +26,9 @@
  * Returns the list of features this module supports.
  *
  * @param string $feature FEATURE_xx constant for requested feature.
- * @return bool|null True if supported, false if not, null if unknown.
+ * @return mixed True if supported, false if not, null if unknown, or a string for purpose features.
  */
-function quickpoll_supports(string $feature): ?bool {
+function quickpoll_supports(string $feature): mixed {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return true;
