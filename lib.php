@@ -65,6 +65,7 @@ function quickpoll_add_instance(stdClass $data, ?mod_quickpoll_mod_form $mform =
     $data->timeclose    = $data->timeclose ?? 0;
 
     $pollid = $DB->insert_record('quickpoll', $data);
+    $data->id = $pollid;
 
     quickpoll_grade_item_update($data);
     quickpoll_save_questions($pollid, $data);
@@ -134,7 +135,7 @@ function quickpoll_delete_instance(int $id): bool {
  * Creates or updates the grade item in the Moodle gradebook.
  *
  * @param stdClass $poll The poll record (must contain id, name, maxgrade).
- * @param mixed $grades GRADE_UPDATE_ITEM_ONLY, a grades array, or null.
+ * @param mixed $grades A grades array, 'reset' to clear recorded grades, or null.
  * @return int GRADE_UPDATE_OK or GRADE_UPDATE_FAILED.
  */
 function quickpoll_grade_item_update(stdClass $poll, mixed $grades = null): int {
@@ -155,12 +156,13 @@ function quickpoll_grade_item_update(stdClass $poll, mixed $grades = null): int 
         $params['grademin']  = 0;
     }
 
-    if ($grades === GRADE_UPDATE_ITEM_ONLY) {
+    $isreset = $grades === 'reset';
+    if ($isreset) {
         $params['reset'] = true;
         $grades          = null;
     }
 
-    return grade_update(
+    $result = grade_update(
         'mod/quickpoll',
         $poll->course ?? 0,
         'mod',
@@ -170,6 +172,27 @@ function quickpoll_grade_item_update(stdClass $poll, mixed $grades = null): int 
         $grades,
         $params
     );
+
+    // The core grade_update() function silently ignores a 'gradepass' key in
+    // $itemdetails: its own internal allow-list (lib/gradelib.php) only lets
+    // itemname/idnumber/gradetype/grademax/grademin/scaleid/multfactor/plusfactor/
+    // deleted/hidden through. The pass grade has to be applied directly on the
+    // grade_item instead, mirroring how mod_workshop does it.
+    if ($result === GRADE_UPDATE_OK && !$isreset && !empty($poll->gradepass)) {
+        $gradeitem = grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'quickpoll',
+            'iteminstance' => $poll->id,
+            'itemnumber' => 0,
+            'courseid' => $poll->course ?? 0,
+        ]);
+        if ($gradeitem && (float)$gradeitem->gradepass !== (float)$poll->gradepass) {
+            $gradeitem->gradepass = (float)$poll->gradepass;
+            $gradeitem->update();
+        }
+    }
+
+    return $result;
 }
 
 /**
