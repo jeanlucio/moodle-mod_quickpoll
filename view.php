@@ -50,6 +50,5 @@ $renderer = $PAGE->get_renderer('mod_quickpoll');
 $data = \mod_quickpoll\local\poll_exporter::export_widget($poll, (int) $cm->id, $context, (int) $USER->id);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($poll->name));
 echo $renderer->render_poll_widget($data);
 echo $OUTPUT->footer();

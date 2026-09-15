@@ -65,7 +65,6 @@ class poll_exporter {
 
         return [
             'cmid' => $cmid,
-            'name' => format_string($poll->name, true, ['context' => $context]),
             'intro' => format_module_intro('quickpoll', $poll, $cmid),
             'isopen' => $manager->is_open(),
             'isclosed' => $manager->is_closed(),
