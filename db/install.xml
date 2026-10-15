@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/quickpoll/db" VERSION="20260508" COMMENT="XMLDB file for mod_quickpoll"
+<XMLDB PATH="mod/quickpoll/db" VERSION="20261015" COMMENT="XMLDB file for mod_quickpoll"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
@@ -79,7 +79,6 @@
       <INDEXES>
         <INDEX NAME="ix_pollid_userid"     UNIQUE="false" FIELDS="pollid, userid"/>
         <INDEX NAME="ix_pollid_questionid" UNIQUE="false" FIELDS="pollid, questionid"/>
-        <INDEX NAME="ix_optionid"          UNIQUE="false" FIELDS="optionid"/>
       </INDEXES>
     </TABLE>
 
