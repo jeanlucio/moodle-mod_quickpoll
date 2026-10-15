@@ -35,6 +35,7 @@ $string['anonymousoptin'] = 'Opt-in — students may choose to be anonymous';
 $string['answered'] = 'Answered';
 $string['answeredby'] = 'Answered by {$a} students';
 $string['answersnow'] = '{$a} responses so far';
+$string['cachedef_pollcounts'] = 'Vote counts of each poll';
 $string['closingon'] = 'Closes on {$a}';
 $string['errornoquestions'] = 'You must add at least one question before saving.';
 $string['errorperiod'] = 'The voting period has ended or has not started yet.';

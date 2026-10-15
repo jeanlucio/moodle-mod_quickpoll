@@ -35,6 +35,7 @@ $string['anonymousoptin'] = 'Opt-in — o estudante pode escolher ficar anônimo
 $string['answered'] = 'Respondida';
 $string['answeredby'] = 'Respondida por {$a} estudantes';
 $string['answersnow'] = '{$a} respostas até agora';
+$string['cachedef_pollcounts'] = 'Contagem de votos de cada enquete';
 $string['closingon'] = 'Encerra em {$a}';
 $string['errornoquestions'] = 'Você deve adicionar pelo menos uma pergunta antes de salvar.';
 $string['errorperiod'] = 'O período de votação encerrou ou ainda não começou.';
