@@ -37,7 +37,9 @@ function quickpoll_supports(string $feature): mixed {
         case FEATURE_GRADE_HAS_GRADE:
             return true;
         case FEATURE_BACKUP_MOODLE2:
-            return true;
+            // Backup and restore arrive in phase 3. Declaring support before the backup/moodle2
+            // classes exist breaks course backups and deleting the activity with the recycle bin on.
+            return false;
         case FEATURE_COMPLETION_TRACKS_VIEWS:
             return true;
         case FEATURE_COMPLETION_HAS_RULES:
